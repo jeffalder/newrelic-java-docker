@@ -1,0 +1,11 @@
+FROM openjdk:11 AS builder
+ADD . /app
+WORKDIR /app
+RUN ./gradlew bootWar
+
+# Multi-stage builds: https://docs.docker.com/develop/develop-images/multistage-build/#use-multi-stage-builds
+FROM base-tomcat
+COPY --from=builder /app/build/libs/demo*war /usr/local/tomcat/webapps/demo.war
+ENV NEW_RELIC_APP_NAME=docker-tomcat-demo
+
+EXPOSE 8080
